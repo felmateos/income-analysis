@@ -1,0 +1,57 @@
+raw_income:
+  type: pandas.CSVDataset
+  filepath: data/01_raw/income.csv
+
+
+clean_income:
+  type: pandas.ParquetDataset
+  filepath: data/02_intermediate/clean_income.parquet
+
+
+X_train:
+  type: pandas.ParquetDataset
+  filepath: data/03_split/X_train.parquet
+
+X_test:
+  type: pandas.ParquetDataset
+  filepath: data/03_split/X_test.parquet
+
+y_train:
+  type: pandas.ParquetDataset
+  filepath: data/03_split/y_train.parquet
+
+y_test:
+  type: pandas.ParquetDataset
+  filepath: data/03_split/y_test.parquet
+
+
+preprocessor:
+  type: pickle.PickleDataset
+  filepath: data/04_preprocessor/preprocessor.pkl
+
+
+X_train_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/X_train_features.parquet
+
+X_test_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/X_test_features.parquet
+
+y_train_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/y_train_features.parquet
+
+y_test_features:
+  type: pandas.ParquetDataset
+  filepath: data/05_model_input/y_test_features.parquet
+
+
+model:
+  type: pickle.PickleDataset
+  filepath: data/06_models/model.pkl
+
+
+metrics:
+  type: json.JSONDataset
+  filepath: data/07_model_output/metrics.json
