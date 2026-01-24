@@ -148,7 +148,7 @@ venv.bak/
 local
 
 #data dir
-data
+data/*/**
 
 # Spyder project settings
 .spyderproject
