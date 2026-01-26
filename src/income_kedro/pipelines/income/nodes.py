@@ -3,7 +3,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score, precision_score, recall_score, precision_recall_curve, auc, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -71,7 +74,84 @@ def train_model(X_train, y_train, model_params):
     return model
 
 
+def _gen_metrics(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+
+    f1 = f1_score(y_test, y_pred)
+    pr = precision_score(y_test, y_pred)
+    rc = recall_score(y_test, y_pred)
+    
+    return {
+        "f1_score": f1,
+        "precision": pr,
+        "recall": rc
+        }
+
+
+def _store_pr_curve(model, X_test, y_test):
+    y_score = model.predict_proba(X_test)[:, 1]
+    pr, rc, _ = precision_recall_curve(y_test, y_score)
+    auc_ = auc(rc, pr)
+
+    plt.figure(figsize=(7, 7))
+
+    plt.plot(rc, pr, label=f'(AUC = {auc_:.3f})', c='green')
+
+    baseline = y_test.mean()
+    plt.hlines(
+        y=baseline,
+        xmin=0,
+        xmax=1,
+        linestyles='--',
+        label=f'Aleatório (prevalência = {baseline[0]:.2f})'
+    )
+
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+    plt.axis('equal')
+
+    ticks = np.linspace(0, 1, 6)
+    plt.xticks(ticks)
+    plt.yticks(ticks)
+
+    plt.gca().set_aspect('equal', adjustable='box')
+
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision–Recall Curve')
+    plt.legend()
+    
+    plt.savefig(
+        "images/pr_curve.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    return
+
+
+def _store_confusion_matrix(model ,X_test, y_test):
+    y_pred = model.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred, normalize='true')
+
+    plt.figure(figsize=(9, 7))
+
+    sns.heatmap(cm, annot=True, fmt='.2f', cmap='Greens')
+
+    plt.xlabel('Pred')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+
+    plt.savefig(
+        "images/confusion_matrix.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+
 def evaluate_model(model, X_test, y_test):
-    preds = model.predict(X_test)
-    acc = accuracy_score(y_test, preds)
-    return {"accuracy": acc}
+    metrics = _gen_metrics(model, X_test, y_test)
+    _store_pr_curve(model, X_test, y_test)
+    _store_confusion_matrix(model, X_test, y_test)
+
+    return metrics
