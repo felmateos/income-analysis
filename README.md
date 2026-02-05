@@ -47,12 +47,12 @@ income-analysis/
 │       ├── catalog.yml
 │       └── parameters.yml
 ├── data/
-│   ├── 05_model_input/
-│   ├── 02_intermediate/
-│   ├── 06_models/
-│   ├── 03_split/
 │   ├── 01_raw/
+│   ├── 02_intermediate/
+│   ├── 03_split/
 │   ├── 04_preprocessor/
+│   ├── 05_model_input/
+│   ├── 06_models/
 │   └── 07_model_output/
 ├── images/
 │   ├── confusion_matrix.png
