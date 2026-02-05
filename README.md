@@ -187,7 +187,7 @@ Este projeto é licenciado sob a Licença MIT.
 
 [contributors-shield]: https://img.shields.io/github/contributors/felmateos/income-analysis.svg?style=for-the-badge
 [contributors-url]: https://github.com/felmateos/income-analysis/graphs/contributors
-[forks-shield]: https://img.shields.io/github/felmateos/income-analysis.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/felmateos/income-analysis.svg?style=for-the-badge
 [forks-url]: https://github.com/felmateos/income-analysis/network/members
 [stars-shield]: https://img.shields.io/github/stars/felmateos/income-analysis.svg?style=for-the-badge
 [stars-url]: https://github.com/felmateos/income-analysis/stargazers
