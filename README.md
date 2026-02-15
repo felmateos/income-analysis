@@ -184,6 +184,14 @@ income.csv
 kedro run
 ```
 
+### Garantia de qualidade de código
+
+Rode a cobertura de testes unitários para garantir o pleno funcionamento dele.
+
+```bash
+pytest --cov=src/income_kedro --cov-report=html
+````
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 🤝 Contribuição
