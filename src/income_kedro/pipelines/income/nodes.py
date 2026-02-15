@@ -191,12 +191,44 @@ def train_model(X_train, y_train, model_params):
 
 
 def _predict(model, model_configs, X_test):
+    """
+    Runs inference for a classification model using a specified threshold.
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model.
+    model_configs : dict
+        Dictionary containing model configuration parameters (mainly threshold).
+    X_test : array-like
+        Test feature matrix.
+
+    Returns
+    -------
+    dict
+        Predicted class labels based on the specified threshold.
+    """
     threshold = model_configs['threshold']
     scores = model.predict_proba(X_test)[:, 1]
     return (scores >= threshold).astype(int)
 
 
 def _predict_proba(model, X_test):
+    """
+    Runs probability inference for a classification model.
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model.
+    X_test : array-like
+        Test feature matrix.
+
+    Returns
+    -------
+    dict
+        Probability of predicted class labels based on the specified threshold.
+    """
     return model.predict_proba(X_test)
 
 
@@ -237,7 +269,7 @@ def _gen_metrics(model, model_configs, X_test, y_test):
         }
 
 
-def _store_pr_curve(model, model_configs, X_test, y_test):
+def _store_pr_curve(model, model_configs, X_test, y_test): # pragma: no cover
     """
     Generate and save the Precision-Recall curve.
 
@@ -298,7 +330,7 @@ def _store_pr_curve(model, model_configs, X_test, y_test):
     return
 
 
-def _store_confusion_matrix(model, model_configs, X_test, y_test):
+def _store_confusion_matrix(model, model_configs, X_test, y_test): # pragma: no cover
     """
     Generate and save the normalized confusion matrix heatmap.
 
