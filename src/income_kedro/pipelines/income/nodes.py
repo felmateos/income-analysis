@@ -6,15 +6,48 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, precision_score, recall_score, precision_recall_curve, auc, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove missing values from the input DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Raw input dataset.
+
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned dataset with rows containing NaN values removed.
+    """
+
     df = df.dropna()
     return df
 
 
 def split_data(df: pd.DataFrame, split_params: dict):
+    """
+    Split the dataset into training and testing sets.
+
+    The target variable is assumed to be the column named 'income'.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataset containing features and target column.
+    split_params : dict
+        Dictionary containing:
+            - test_size (float): Proportion of the dataset to include in the test split.
+            - random_state (int): Random seed for reproducibility.
+
+    Returns
+    -------
+    tuple
+        X_train, X_test, y_train, y_test
+    """
+
     X = df.drop("income", axis=1)
     y = df[["income"]]
 
@@ -26,6 +59,27 @@ def split_data(df: pd.DataFrame, split_params: dict):
     )
 
 def fit_preprocessor(X_train: pd.DataFrame, feature_params) -> ColumnTransformer:
+    """
+    Fit a preprocessing pipeline for categorical and numerical features.
+
+    Categorical features are one-hot encoded (dropping first level),
+    and numerical features are standardized.
+
+    Parameters
+    ----------
+    X_train : pd.DataFrame
+        Training feature matrix.
+    feature_params : dict
+        Dictionary containing:
+            - cat_cols (list): List of categorical column names.
+            - num_cols (list): List of numerical column names.
+
+    Returns
+    -------
+    ColumnTransformer
+        Fitted preprocessing transformer.
+    """
+
     X_train = X_train.copy()
 
     cat_cols = feature_params['cat_cols']
@@ -43,6 +97,27 @@ def fit_preprocessor(X_train: pd.DataFrame, feature_params) -> ColumnTransformer
     return ct
 
 def _encode_label(y: pd.DataFrame, feature_params) -> pd.DataFrame:
+    """
+    Encode the target variable into binary format.
+
+    The target is converted to:
+        '>50K' -> 1
+        otherwise -> 0
+
+    Parameters
+    ----------
+    y : pd.DataFrame
+        Target DataFrame.
+    feature_params : dict
+        Dictionary containing:
+            - target_col (str): Name of the target column.
+
+    Returns
+    -------
+    pd.DataFrame
+        Encoded target DataFrame.
+    """
+
     y = y.copy()
 
     target_col = feature_params['target_col']
@@ -51,6 +126,27 @@ def _encode_label(y: pd.DataFrame, feature_params) -> pd.DataFrame:
     return y
 
 def apply_preprocessor(X: pd.DataFrame, y: pd.DataFrame, preprocessor: ColumnTransformer, feature_params) -> pd.DataFrame:
+    """
+    Apply a fitted preprocessor to features and encode the target.
+
+    Parameters
+    ----------
+    X : pd.DataFrame
+        Feature matrix.
+    y : pd.DataFrame
+        Target DataFrame.
+    preprocessor : ColumnTransformer
+        Fitted preprocessing pipeline.
+    feature_params : dict
+        Dictionary containing:
+            - target_col (str): Name of the target column.
+
+    Returns
+    -------
+    tuple
+        Transformed feature DataFrame and encoded target DataFrame.
+    """
+
     X_t = preprocessor.transform(X)
     feature_names = preprocessor.get_feature_names_out()
     X = pd.DataFrame(
@@ -64,6 +160,28 @@ def apply_preprocessor(X: pd.DataFrame, y: pd.DataFrame, preprocessor: ColumnTra
 
 
 def train_model(X_train, y_train, model_params):
+    """
+    Train a Logistic Regression classifier.
+
+    Parameters
+    ----------
+    X_train : array-like
+        Training feature matrix.
+    y_train : array-like
+        Training target values.
+    model_params : dict
+        Dictionary containing:
+            - C (float): Inverse regularization strength.
+            - penalty (str): Type of regularization.
+            - solver (str): Optimization solver.
+            - random_state (int): Random seed.
+
+    Returns
+    -------
+    LogisticRegression
+        Fitted Logistic Regression model.
+    """
+
     model = LogisticRegression(
         C=model_params["C"],
         penalty=model_params["penalty"],
@@ -75,6 +193,29 @@ def train_model(X_train, y_train, model_params):
 
 
 def _gen_metrics(model, X_test, y_test):
+    """
+    Compute classification performance metrics.
+
+    Metrics computed:
+        - F1-score
+        - Precision
+        - Recall
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model.
+    X_test : array-like
+        Test feature matrix.
+    y_test : array-like
+        True test labels.
+
+    Returns
+    -------
+    dict
+        Dictionary containing f1_score, precision, and recall.
+    """
+
     y_pred = model.predict(X_test)
 
     f1 = f1_score(y_test, y_pred)
@@ -89,6 +230,25 @@ def _gen_metrics(model, X_test, y_test):
 
 
 def _store_pr_curve(model, X_test, y_test):
+    """
+    Generate and save the Precision-Recall curve.
+
+    The curve is saved to 'images/pr_curve.png'.
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model with predict_proba method.
+    X_test : array-like
+        Test feature matrix.
+    y_test : array-like
+        True test labels.
+
+    Returns
+    -------
+    None
+    """
+
     y_score = model.predict_proba(X_test)[:, 1]
     pr, rc, _ = precision_recall_curve(y_test, y_score)
     auc_ = auc(rc, pr)
@@ -131,6 +291,26 @@ def _store_pr_curve(model, X_test, y_test):
 
 
 def _store_confusion_matrix(model ,X_test, y_test):
+    """
+    Generate and save the normalized confusion matrix heatmap.
+
+    The matrix is normalized by true labels and saved to
+    'images/confusion_matrix.png'.
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model.
+    X_test : array-like
+        Test feature matrix.
+    y_test : array-like
+        True test labels.
+
+    Returns
+    -------
+    None
+    """
+
     y_pred = model.predict(X_test)
     cm = confusion_matrix(y_test, y_pred, normalize='true')
 
@@ -150,6 +330,29 @@ def _store_confusion_matrix(model ,X_test, y_test):
 
 
 def evaluate_model(model, X_test, y_test):
+    """
+    Evaluate a trained model and store evaluation artifacts.
+
+    This function:
+        - Computes classification metrics
+        - Saves Precision-Recall curve
+        - Saves confusion matrix
+
+    Parameters
+    ----------
+    model : sklearn estimator
+        Trained classification model.
+    X_test : array-like
+        Test feature matrix.
+    y_test : array-like
+        True test labels.
+
+    Returns
+    -------
+    dict
+        Dictionary containing evaluation metrics.
+    """
+
     metrics = _gen_metrics(model, X_test, y_test)
     _store_pr_curve(model, X_test, y_test)
     _store_confusion_matrix(model, X_test, y_test)
