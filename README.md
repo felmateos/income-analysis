@@ -30,7 +30,7 @@
 
 Este projeto tem como objetivo desenvolver um pipeline de ciência de dados para **predição de renda anual de indivíduos**, a partir de atributos demográficos, educacionais e ocupacionais. O problema é formulado como uma **classificação binária**, em que o modelo estima se a renda anual de uma pessoa é **superior ou inferior a US$ 50.000**.
 
-Além do desempenho preditivo, o foco central do estudo está na **análise dos fatores associados à renda**, buscando identificar padrões socioeconômicos relevantes e compreender como diferentes variáveis influenciam a probabilidade de um indivíduo pertencer à classe de maior renda. Todo o fluxo foi estruturado utilizando o **Kedro**, garantindo organização, reprodutibilidade e separação clara entre dados, experimentos e resultados.
+Além do desempenho preditivo, o foco central do estudo está na **análise dos fatores associados à renda**, buscando identificar padrões socioeconômicos relevantes e compreender como diferentes variáveis influenciam a probabilidade de um indivíduo pertencer à classe de maior renda. Todo o fluxo foi estruturado utilizando o **Kedro** e testes unitários usando **pytest**, garantindo organização, reprodutibilidade e separação clara entre dados, experimentos e resultados.
 
 <div align="center">
     <img src="images/money_angel.gif" alt="Logo" height="300">
@@ -43,9 +43,12 @@ Além do desempenho preditivo, o foco central do estudo está na **análise dos 
 ```bash
 income-analysis/
 ├── conf/
-│   └── base/
-│       ├── catalog.yml
-│       └── parameters.yml
+│   ├── base/
+│   │   ├── catalog.yml
+│   │   └── parameters.yml
+│   │
+│   └── local/
+│
 ├── data/
 │   ├── 01_raw/
 │   ├── 02_intermediate/
@@ -54,21 +57,30 @@ income-analysis/
 │   ├── 05_model_input/
 │   ├── 06_models/
 │   └── 07_model_output/
+│
 ├── images/
 │   ├── confusion_matrix.png
 │   ├── income_logo.png
 │   ├── money_angel.png
 │   └── pr_curve.png
+│
 ├── notebooks/
 │   └── income_analysis.ipynb
+│
 ├── src/
 │   ├── pipeline_registry.py
 │   ├── settings.py
-│   └── income_kedro/
+│   ├── income_kedro/
+│   │   └── pipelines/
+│   │       └── income/
+│   │            ├── nodes.py
+│   │            └── pipeline.py
+│   │
+│   └── tests/
 │       └── pipelines/
 │           └── income/
-│                ├── nodes.py
-│                └── pipeline.py
+│                └── test_nodes.py
+│
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
