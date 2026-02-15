@@ -145,7 +145,7 @@ env.bak/
 venv.bak/
 
 #local configs
-local
+conf/local/*.yml
 
 #data dir
 data/*/**

@@ -2,10 +2,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, precision_score, recall_score, precision_recall_curve, auc, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -81,6 +82,8 @@ def fit_preprocessor(X_train: pd.DataFrame, feature_params) -> ColumnTransformer
     """
 
     X_train = X_train.copy()
+
+    print(X_train.columns)
 
     cat_cols = feature_params['cat_cols']
     num_cols = feature_params['num_cols']
@@ -182,17 +185,22 @@ def train_model(X_train, y_train, model_params):
         Fitted Logistic Regression model.
     """
 
-    model = LogisticRegression(
-        C=model_params["C"],
-        penalty=model_params["penalty"],
-        solver=model_params["solver"],
-        random_state=model_params["random_state"],
-    )
+    model = RandomForestClassifier(**model_params)
     model.fit(X_train, y_train)
     return model
 
 
-def _gen_metrics(model, X_test, y_test):
+def _predict(model, model_configs, X_test):
+    threshold = model_configs['threshold']
+    scores = model.predict_proba(X_test)[:, 1]
+    return (scores >= threshold).astype(int)
+
+
+def _predict_proba(model, X_test):
+    return model.predict_proba(X_test)
+
+
+def _gen_metrics(model, model_configs, X_test, y_test):
     """
     Compute classification performance metrics.
 
@@ -216,7 +224,7 @@ def _gen_metrics(model, X_test, y_test):
         Dictionary containing f1_score, precision, and recall.
     """
 
-    y_pred = model.predict(X_test)
+    y_pred = _predict(model, model_configs, X_test)
 
     f1 = f1_score(y_test, y_pred)
     pr = precision_score(y_test, y_pred)
@@ -229,7 +237,7 @@ def _gen_metrics(model, X_test, y_test):
         }
 
 
-def _store_pr_curve(model, X_test, y_test):
+def _store_pr_curve(model, model_configs, X_test, y_test):
     """
     Generate and save the Precision-Recall curve.
 
@@ -249,7 +257,7 @@ def _store_pr_curve(model, X_test, y_test):
     None
     """
 
-    y_score = model.predict_proba(X_test)[:, 1]
+    y_score = _predict_proba(model, X_test)[:, 1]
     pr, rc, _ = precision_recall_curve(y_test, y_score)
     auc_ = auc(rc, pr)
 
@@ -290,7 +298,7 @@ def _store_pr_curve(model, X_test, y_test):
     return
 
 
-def _store_confusion_matrix(model ,X_test, y_test):
+def _store_confusion_matrix(model, model_configs, X_test, y_test):
     """
     Generate and save the normalized confusion matrix heatmap.
 
@@ -311,7 +319,7 @@ def _store_confusion_matrix(model ,X_test, y_test):
     None
     """
 
-    y_pred = model.predict(X_test)
+    y_pred = _predict(model, model_configs, X_test)
     cm = confusion_matrix(y_test, y_pred, normalize='true')
 
     plt.figure(figsize=(9, 7))
@@ -329,7 +337,7 @@ def _store_confusion_matrix(model ,X_test, y_test):
     )
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, model_configs, X_test, y_test):
     """
     Evaluate a trained model and store evaluation artifacts.
 
@@ -353,8 +361,8 @@ def evaluate_model(model, X_test, y_test):
         Dictionary containing evaluation metrics.
     """
 
-    metrics = _gen_metrics(model, X_test, y_test)
-    _store_pr_curve(model, X_test, y_test)
-    _store_confusion_matrix(model, X_test, y_test)
+    metrics = _gen_metrics(model, model_configs, X_test, y_test)
+    _store_pr_curve(model, model_configs, X_test, y_test)
+    _store_confusion_matrix(model, model_configs, X_test, y_test)
 
     return metrics

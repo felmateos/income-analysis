@@ -41,7 +41,7 @@ def create_pipeline(**kwargs):
             ),
             node(
                 evaluate_model,
-                inputs=["model", "X_test_features", "y_test_features"],
+                inputs=["model",  "params:model_configs", "X_test_features", "y_test_features"],
                 outputs="metrics",
             ),
         ]
