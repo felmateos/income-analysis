@@ -137,11 +137,14 @@ A curva Precision-Recall é utilizada como principal ferramenta de avaliação, 
 
 ## 🔎 Análise dos Resultados
 
-A análise dos resultados indica que variáveis como **ganho de capital declarado**, **nível educacional elevado** (Bachelor, Master, Doctorate ou Professional School) e **estado civil casado** estão associadas a uma maior probabilidade de o indivíduo pertencer à classe de renda acima de US$ 50.000.
+### Sobre as features que mais impactam
+a. Aparentemente pessoas casadas, com maior escolaridade e com ganho e perda de capital declarado tendem a ter uma chance maior de terem uma renda >= 50k. 
 
-Por outro lado, indivíduos com **menor grau de escolaridade**, ocupações ligadas a **serviços domésticos** e origem em determinados países latino-americanos apresentam maior associação com a classe de menor renda. Esses resultados levantam discussões relevantes sobre desigualdade socioeconômica, perfil ocupacional e possíveis vieses presentes nos dados.
+b. Já pessoas mais novas e que trabalham menor horas por semana tendem a ter uma chance maior de terem uma renda < 50k.
 
-Como limitação do estudo, destaca-se a forte influência das variáveis de ganho de capital. Um possível próximo passo seria conduzir experimentos removendo essas features, avaliando o poder preditivo do modelo apenas com atributos demográficos e ocupacionais.
+### Limitações
+1. Os métodos estatísticos foram realizados utilizando todas as informações disponíveis, inclusive ganho/perda de capital, a qual já diz muito sobre se uma pessoa tem ou não uma alta renda. Seria interessante em estudos futuros treinar modelos sem essas features e ver se ainda assim eles tem uma boa capacidade de generalização.
+2. Grande parte dos dados são provenientes de pessoas dos US, assim sendo, temos uma parcela de imigrantes que pode estar sendo sub representada e gerando vieses.
 
 ---
 

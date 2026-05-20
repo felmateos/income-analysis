@@ -41,4 +41,4 @@ split_params:
   random_state: 777
 model_configs:
   model_type: RandomForestClassifier
-  threshold: 0.3902859252443551
+  threshold: 0.3877258382229492
